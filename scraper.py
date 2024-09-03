@@ -1,25 +1,8 @@
-import time
-import schedule
-import logging
 import requests
 from bs4 import BeautifulSoup
 from googleapiclient.discovery import build
 from google.oauth2 import service_account
 from googleapiclient.errors import HttpError
-import logging.handlers
-
-# logging config
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-# logger_file_handler = logging.handlers.RotatingFileHandler(
-#     "status.log",
-#     maxBytes=1024 * 1024,
-#     backupCount=1,
-#     encoding="utf8",
-# )
-# formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-# logger_file_handler.setFormatter(formatter)
-# logger.addHandler(logger_file_handler)
 
 # Google spreadsheet config
 SPREADSHEET_ID = '1pCpjOGxi8mEc2QYa8ETW-_niD7VEa8XIC0OP9mWHi3E'
@@ -88,23 +71,9 @@ def update_sheet(data):
     except HttpError as error:
         return f"An error occurred: {error}"
 
-# # When running locally
-# def job():
-#     scraped_data = scrape()
-#     prepared_data = prep_data(scraped_data)
-#     update_sheet(prepared_data)
-#
-# schedule.every(5).minutes.do(job)
-    
-# if __name__ == "__main__":
-#     while True:
-#         schedule.run_pending()
-#         time.sleep(1)
-
 
 if __name__ == "__main__":
     scraped_data = scrape()
     prepared_data = prep_data(scraped_data)
     response = update_sheet(prepared_data)
     print("response", response)
-    logger.info(f'Status: {response}')
