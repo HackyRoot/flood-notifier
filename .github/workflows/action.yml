@@ -2,7 +2,9 @@ name: Data Scraper
 
 on:
   schedule:
-    - cron: "*/1 * * * *" # every 5th minute
+    - cron: "*/5 * * * *" # every 5th minute
+  push:
+    branches: ["main"]
 
 jobs:
   build:
