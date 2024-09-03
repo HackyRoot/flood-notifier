@@ -1,13 +1,13 @@
 {
   "functions": {
-    "scraper_vercel.py": {
+    "api/scraper_vercel.py": {
       "memory": 1024,
       "maxDuration": 10
     }
   },
   "crons": [
     {
-      "path": "/scraper_vercel",
+      "path": "/api/scraper_vercel",
       "schedule": "*/5 * * * *"
     }
   ]
