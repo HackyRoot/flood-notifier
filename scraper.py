@@ -1,12 +1,27 @@
 import time
+import schedule
+import logging
 import requests
 from bs4 import BeautifulSoup
 from googleapiclient.discovery import build
 from google.oauth2 import service_account
 from googleapiclient.errors import HttpError
-import schedule
+import logging.handlers
 
+# logging config
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+# logger_file_handler = logging.handlers.RotatingFileHandler(
+#     "status.log",
+#     maxBytes=1024 * 1024,
+#     backupCount=1,
+#     encoding="utf8",
+# )
+# formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+# logger_file_handler.setFormatter(formatter)
+# logger.addHandler(logger_file_handler)
 
+# Google spreadsheet config
 SPREADSHEET_ID = '1pCpjOGxi8mEc2QYa8ETW-_niD7VEa8XIC0OP9mWHi3E'
 SERVICE_ACCOUNT_FILE = 'service.json'
 SCRAPE_INTERVAL = 300
@@ -54,11 +69,14 @@ def prep_data(scraped_data):
     
     return [prepared_data]
 
+import json, os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def update_sheet(data):
-    credentials = service_account.Credentials.from_service_account_file(
-        SERVICE_ACCOUNT_FILE, scopes=['https://www.googleapis.com/auth/spreadsheets']
-    )
+    info = json.loads(os.environ['GOOGLE_SERVICE_ACCOUNT_TOKEN'])
+    credentials = service_account.Credentials.from_service_account_info(info)
 
     try:
         service = build('sheets', 'v4', credentials=credentials)
@@ -66,20 +84,27 @@ def update_sheet(data):
         result = service.spreadsheets().values().append(
             spreadsheetId=SPREADSHEET_ID, range=RANGE_NAME,
             valueInputOption='USER_ENTERED', body=body).execute()
-        print(f"{result.get('updates').get('updatedCells')} cells updated.")
+        return f"{result.get('updates').get('updatedCells')} cells updated."
     except HttpError as error:
-        print(f"An error occurred: {error}")
+        return f"An error occurred: {error}"
+
+# # When running locally
+# def job():
+#     scraped_data = scrape()
+#     prepared_data = prep_data(scraped_data)
+#     update_sheet(prepared_data)
+#
+# schedule.every(5).minutes.do(job)
+    
+# if __name__ == "__main__":
+#     while True:
+#         schedule.run_pending()
+#         time.sleep(1)
 
 
-def job():
+if __name__ == "__main__":
     scraped_data = scrape()
     prepared_data = prep_data(scraped_data)
-    update_sheet(prepared_data)
-
-
-schedule.every(5).minutes.do(job)
-    
-if __name__ == "__main__":
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+    response = update_sheet(prepared_data)
+    print("response", response)
+    logger.info(f'Status: {response}')
