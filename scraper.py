@@ -3,6 +3,11 @@ from bs4 import BeautifulSoup
 from googleapiclient.discovery import build
 from google.oauth2 import service_account
 from googleapiclient.errors import HttpError
+import json, os
+
+# Enable when in local
+# from dotenv import load_dotenv
+# load_dotenv()
 
 # Google spreadsheet config
 SPREADSHEET_ID = '1pCpjOGxi8mEc2QYa8ETW-_niD7VEa8XIC0OP9mWHi3E'
@@ -51,11 +56,6 @@ def prep_data(scraped_data):
             prepared_data[index + 1] = timestamp
     
     return [prepared_data]
-
-import json, os
-from dotenv import load_dotenv
-
-load_dotenv()
 
 def update_sheet(data):
     info = json.loads(os.environ['GOOGLE_SERVICE_ACCOUNT_TOKEN'])
