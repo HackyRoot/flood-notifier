@@ -21,13 +21,13 @@ jobs:
           cache: "pip" # caching pip dependencies
 
       - name: Install python packages
-        run: pip install -r requirements.txt
+        run: pip install -r backend/requirements.txt
 
       - name: Execute python script
         env:
           GOOGLE_SERVICE_ACCOUNT_TOKEN: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_TOKEN }}
         run: |
-          python scraper.py
+          python backend/scraper.py
           echo "Finished script execution at $(date)"
 
       - name: Log cron job
